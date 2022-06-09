@@ -386,7 +386,14 @@ func NewServer(config *Config, consulCatalog consul.CatalogAPI, consulConfigEntr
 	}
 
 	// Set up the keyring
-	encrypter, err := NewEncrypter(filepath.Join(s.config.DataDir, "keystore"))
+	keystorePath := filepath.Join(s.config.DataDir, "keystore")
+	if s.config.DevMode {
+		keystorePath, err = os.MkdirTemp("", "nomad-keystore")
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create keystore tempdir")
+		}
+	}
+	encrypter, err := NewEncrypter(keystorePath)
 	if err != nil {
 		return nil, err
 	}
