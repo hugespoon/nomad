@@ -630,11 +630,11 @@ func TestHTTP_PrefixSearch_SecureVariables(t *testing.T) {
 	testPathPrefix := "alpha/beta"
 
 	httpTest(t, nil, func(s *TestAgent) {
-		sv := mock.SecureVariable()
+		sv := mock.SecureVariableEncrypted()
 
 		state := s.Agent.server.State()
 		sv.Path = testPath
-		err := state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariable{sv})
+		err := state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariableEncrypted{sv})
 		require.NoError(t, err)
 
 		data := structs.SearchRequest{Prefix: testPathPrefix, Context: structs.SecureVariables}
@@ -662,9 +662,9 @@ func TestHTTP_FuzzySearch_SecureVariables(t *testing.T) {
 
 	httpTest(t, nil, func(s *TestAgent) {
 		state := s.Agent.server.State()
-		sv := mock.SecureVariable()
+		sv := mock.SecureVariableEncrypted()
 		sv.Path = testPath
-		err := state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariable{sv})
+		err := state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariableEncrypted{sv})
 		require.NoError(t, err)
 
 		data := structs.FuzzySearchRequest{Text: testPathText, Context: structs.SecureVariables}
@@ -696,14 +696,14 @@ func TestHTTP_PrefixSearch_SecureVariables_ACL(t *testing.T) {
 	httpACLTest(t, nil, func(s *TestAgent) {
 		state := s.Agent.server.State()
 		ns := mock.Namespace()
-		sv1 := mock.SecureVariable()
+		sv1 := mock.SecureVariableEncrypted()
 		sv1.Path = testPath
 		sv2 := sv1.Copy()
 		sv2.Namespace = ns.Name
 
 		_ = state.UpsertNamespaces(7000, []*structs.Namespace{mock.Namespace()})
-		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariable{sv1})
-		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8001, []*structs.SecureVariable{sv2})
+		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariableEncrypted{sv1})
+		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8001, []*structs.SecureVariableEncrypted{&sv2})
 
 		rootToken := s.RootToken
 		defNSToken := mock.CreatePolicyAndToken(t, state, 8002, "default", mock.NamespacePolicy("default", "read", nil))
@@ -792,14 +792,14 @@ func TestHTTP_FuzzySearch_SecureVariables_ACL(t *testing.T) {
 	httpACLTest(t, nil, func(s *TestAgent) {
 		state := s.Agent.server.State()
 		ns := mock.Namespace()
-		sv1 := mock.SecureVariable()
+		sv1 := mock.SecureVariableEncrypted()
 		sv1.Path = testPath
 		sv2 := sv1.Copy()
 		sv2.Namespace = ns.Name
 
 		_ = state.UpsertNamespaces(7000, []*structs.Namespace{mock.Namespace()})
-		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariable{sv1})
-		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8001, []*structs.SecureVariable{sv2})
+		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8000, []*structs.SecureVariableEncrypted{sv1})
+		_ = state.UpsertSecureVariables(structs.MsgTypeTestSetup, 8001, []*structs.SecureVariableEncrypted{&sv2})
 
 		rootToken := s.RootToken
 		defNSToken := mock.CreatePolicyAndToken(t, state, 8002, "default", mock.NamespacePolicy("default", "read", nil))

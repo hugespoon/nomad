@@ -77,7 +77,7 @@ func (s *Search) getPrefixMatches(iter memdb.ResultIterator, prefix string) ([]s
 			id = t.ID
 		case *structs.Namespace:
 			id = t.Name
-		case *structs.SecureVariable:
+		case *structs.SecureVariableEncrypted:
 			id = t.Path
 		default:
 			matchID, ok := getEnterpriseMatch(raw)
@@ -217,7 +217,7 @@ func (s *Search) fuzzyMatchSingle(raw interface{}, text string) (structs.Context
 	case *structs.CSIPlugin:
 		name = t.ID
 		ctx = structs.Plugins
-	case *structs.SecureVariable:
+	case *structs.SecureVariableEncrypted:
 		name = t.Path
 		scope = []string{t.Namespace, t.Path}
 		ctx = structs.SecureVariables
@@ -480,7 +480,7 @@ func nsCapFilter(aclObj *acl.ACL) memdb.FilterFunc {
 		case *structs.Allocation:
 			return !aclObj.AllowNsOp(t.Namespace, acl.NamespaceCapabilityReadJob)
 
-		case *structs.SecureVariable:
+		case *structs.SecureVariableEncrypted:
 			// FIXME: Update to final implementation.
 			return !aclObj.AllowNsOp(t.Namespace, acl.NamespaceCapabilityReadJob)
 
